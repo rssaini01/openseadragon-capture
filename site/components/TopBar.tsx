@@ -1,0 +1,56 @@
+interface TopBarProps {
+  onDelete: () => void;
+  onClearAll: () => void;
+  onExport: () => void;
+  objectCount: number;
+}
+
+export function TopBar({
+  onDelete,
+  onClearAll,
+  onExport,
+  objectCount,
+}: Readonly<TopBarProps>) {
+  return (
+    <div className="bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center gap-4 shadow-lg animate-slide-down">
+      {/* Actions */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-semibold text-slate-400 uppercase">Actions</span>
+        <button
+          className="px-3 py-1.5 bg-red-600/80 hover:bg-red-500 rounded-md text-white text-sm font-medium transition-all duration-300 hover:scale-105 shadow-md shadow-red-500/30 flex items-center gap-1.5"
+          onClick={onDelete}
+          title="Delete Selected (Del)"
+        >
+          ❌ Delete
+        </button>
+        <button
+          className="px-3 py-1.5 bg-orange-600/80 hover:bg-orange-500 rounded-md text-white text-sm font-medium transition-all duration-300 hover:scale-105 shadow-md shadow-orange-500/30 flex items-center gap-1.5"
+          onClick={onClearAll}
+          title="Clear All"
+        >
+          🗑️ Clear
+        </button>
+        <button
+          className="px-3 py-1.5 bg-green-600/80 hover:bg-green-500 rounded-md text-white text-sm font-medium transition-all duration-300 hover:scale-105 shadow-md shadow-green-500/30 flex items-center gap-1.5"
+          onClick={onExport}
+          title="Export PNG (Ctrl+E)"
+        >
+          💾 Export
+        </button>
+      </div>
+
+      <div className="flex-1"></div>
+
+      {/* Stats */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 bg-blue-600/20 border border-blue-500/30 px-3 py-1.5 rounded-md">
+          <span className="text-xs font-semibold text-blue-400">Objects:</span>
+          <span className="text-lg font-bold text-blue-300">{objectCount}</span>
+        </div>
+        <div className="text-xs text-slate-400">
+          ⌨️ Esc • Del • Ctrl+E
+        </div>
+      </div>
+    </div>
+  );
+}
