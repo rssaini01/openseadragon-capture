@@ -1,0 +1,26 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+#viewer {
+  width: 800px;
+  height: 600px;
+  border: 1px solid #ccc;
+}
+
+.controls {
+  margin: 20px 0;
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.preview {
+  max-width: 400px;
+  border: 1px solid #ccc;
+  margin: 10px;
+}

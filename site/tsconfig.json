@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "outDir": "dist",
+    "rootDir": "..",
+    "baseUrl": ".",
+    "paths": {
+      "openseadragon-screenshot": [
+        "../src/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "./**/*"
+  ]
+}

@@ -1,22 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OpenSeadragon Screenshot Demo</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #viewer { width: 800px; height: 600px; border: 1px solid #ccc; }
-    .controls { margin: 20px 0; }
-    button { margin: 5px; padding: 10px; }
-  </style>
 </head>
 <body>
-  <h1>OpenSeadragon Screenshot Demo</h1>
-  <div id="viewer"></div>
-  <div class="controls">
-    <button id="addOverlay">Add Text Overlay</button>
-    <button id="capture">Capture Screenshot</button>
-    <button id="download">Download Screenshot</button>
-  </div>
-  <script type="module" src="./main.js"></script>
+  <div id="app"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
