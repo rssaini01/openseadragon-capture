@@ -1,0 +1,17 @@
+{
+  "name": "site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "openseadragon": "^5.0.1",
+    "openseadragon-screenshot": "file:.."
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
