@@ -11,8 +11,8 @@ interface TopBarProps {
   setQuality: (quality: number) => void;
   scale: number;
   setScale: (scale: number) => void;
-  fullImage: boolean;
-  setFullImage: (fullImage: boolean) => void;
+  fitImageToViewport: boolean;
+  setFitImageToViewport: (fitImageToViewport: boolean) => void;
 }
 
 import { Trash2, Eraser, Download } from "lucide-preact";
@@ -28,8 +28,8 @@ export function TopBar({
   setQuality,
   scale,
   setScale,
-  fullImage,
-  setFullImage
+  fitImageToViewport,
+  setFitImageToViewport
 }: Readonly<TopBarProps>) {
   return (
     <div className="bg-gray-100 border-b border-gray-300 px-6 py-3 flex items-center gap-3">
@@ -90,10 +90,10 @@ export function TopBar({
       <label className="flex items-center gap-2 text-sm cursor-pointer">
         <input
           type="checkbox"
-          checked={fullImage}
-          onChange={(e) => setFullImage(e.currentTarget.checked)}
+          checked={fitImageToViewport}
+          onChange={(e) => setFitImageToViewport(e.currentTarget.checked)}
           className="cursor-pointer"
-        /> Full Image
+        /> Fit Image
       </label>
       <div className="flex-1"></div>
       <div className="bg-indigo-100 border border-indigo-300 px-3 py-1.5 rounded">

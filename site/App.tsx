@@ -19,7 +19,7 @@ export function App() {
   const [format, setFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [quality, setQuality] = useState(1);
   const [scale, setScale] = useState(1);
-  const [fullImage, setFullImage] = useState(true);
+  const [fitImageToViewport, setFitImageToViewport] = useState(true);
   const overlayRef = useRef<FabricOverlay | null>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
 
@@ -60,7 +60,7 @@ export function App() {
         format,
         quality,
         scale,
-        fullImage,
+        fitImageToViewport,
         overlays: canvas ? [canvas.getElement()] : []
       });
     } catch (error) {
@@ -108,8 +108,8 @@ export function App() {
           setQuality={setQuality}
           scale={scale}
           setScale={setScale}
-          fullImage={fullImage}
-          setFullImage={setFullImage}
+          fitImageToViewport={fitImageToViewport}
+          setFitImageToViewport={setFitImageToViewport}
         />
       )}
       <div className="flex flex-1 overflow-hidden">
