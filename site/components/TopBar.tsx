@@ -1,12 +1,12 @@
-type ImageFormat = 'png' | 'jpeg' | 'webp';
+import type { ScreenshotFormat } from 'openseadragon-screenshot';
 
 interface TopBarProps {
   onDelete: () => void;
   onClearAll: () => void;
   onExport: () => void;
   objectCount: number;
-  format: ImageFormat;
-  setFormat: (format: ImageFormat) => void;
+  format: ScreenshotFormat;
+  setFormat: (format: ScreenshotFormat) => void;
   quality: number;
   setQuality: (quality: number) => void;
   scale: number;
@@ -57,7 +57,7 @@ export function TopBar({
       <select
         className="px-3 py-1.5 rounded border border-gray-300 text-sm"
         value={format}
-        onChange={(e) => setFormat(e.currentTarget.value as ImageFormat)}
+        onChange={(e) => setFormat(e.currentTarget.value as ScreenshotFormat)}
       >
         <option value="png">PNG</option>
         <option value="jpeg">JPEG</option>
