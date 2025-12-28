@@ -19,7 +19,7 @@ export function App() {
   const [format, setFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [quality, setQuality] = useState(1);
   const [scale, setScale] = useState(1);
-  const [fitImageToViewport, setFitImageToViewport] = useState(true);
+  const [fitImageToViewport, setFitImageToViewport] = useState(false);
   const overlayRef = useRef<FabricOverlay | null>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
 

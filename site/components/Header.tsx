@@ -9,7 +9,7 @@ export function Header({ isFabricMode, setIsFabricMode }: Readonly<HeaderProps>)
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-3">
           <span className="text-4xl">📸</span>
-          <h1 className="text-2xl font-bold text-white">OpenSeadragon Screenshot</h1>
+          <h1 className="text-2xl font-bold text-white">OpenSeadragon Capture</h1>
         </div>
         <div className="flex gap-3">
           <button

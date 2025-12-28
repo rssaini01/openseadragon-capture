@@ -1,5 +1,10 @@
 # openseadragon-capture
 
+[![npm version](https://img.shields.io/npm/v/openseadragon-capture.svg)](https://www.npmjs.com/package/openseadragon-capture)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/rssaini01/openseadragon-capture/deploy-demo-site.yml?branch=main)](https://github.com/rssaini01/openseadragon-capture/actions)
+[![Downloads](https://img.shields.io/npm/dm/openseadragon-capture.svg)](https://www.npmjs.com/package/openseadragon-capture)
+
 Capture high-quality screenshots from OpenSeadragon viewers with optional overlay layers.
 
 ## Installation
