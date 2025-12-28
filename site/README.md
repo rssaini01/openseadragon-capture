@@ -1,6 +1,6 @@
 # Demo Site
 
-TypeScript + Preact demo showcasing the openseadragon-screenshot plugin functionality.
+TypeScript + Preact demo showcasing the openseadragon-capture plugin functionality.
 
 ## Features
 
@@ -31,4 +31,4 @@ Then open http://localhost:3000
 - Preact
 - Vite
 - OpenSeadragon
-- openseadragon-screenshot plugin
+- openseadragon-capture plugin

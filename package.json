@@ -1,5 +1,5 @@
 {
-  "name": "openseadragon-screenshot",
+  "name": "openseadragon-capture",
   "version": "1.0.0",
   "description": "Capture high-quality screenshots from OpenSeadragon viewers with optional overlay layers.",
   "type": "module",
@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rssaini01/openseadragon-screenshot.git"
+    "url": "git+https://github.com/rssaini01/openseadragon-capture.git"
   },
   "keywords": [
     "openseadragon",
@@ -49,9 +49,9 @@
   "author": "Ravi Shankar Saini",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rssaini01/openseadragon-screenshot/issues"
+    "url": "https://github.com/rssaini01/openseadragon-capture/issues"
   },
-  "homepage": "https://github.com/rssaini01/openseadragon-screenshot/",
+  "homepage": "https://github.com/rssaini01/openseadragon-capture/",
   "devDependencies": {
     "@types/openseadragon": "^5.0.1",
     "openseadragon": "^5.0.1",

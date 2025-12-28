@@ -1,4 +1,4 @@
-import type { ScreenshotFormat } from 'openseadragon-screenshot';
+import type { ScreenshotFormat } from 'openseadragon-capture';
 
 interface TopBarProps {
   onDelete: () => void;

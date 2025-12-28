@@ -71,7 +71,7 @@ export class OpenSeadragonScreenshot {
 
   private ensureViewerReady(): void {
     if (!this.viewer.isOpen()) {
-      throw new Error('[OpenSeadragon Screenshot] Viewer is not open. Wait for the "open" event before capturing.');
+      throw new Error('[OpenSeadragon Capture] Viewer is not open. Wait for the "open" event before capturing.');
     }
   }
 
@@ -90,7 +90,7 @@ export class OpenSeadragonScreenshot {
   private getCanvas(): HTMLCanvasElement {
     const canvas = this.viewer.drawer?.canvas;
     if (!canvas) {
-      throw new Error('[OpenSeadragon Screenshot] Canvas not available. Ensure viewer is fully initialized.');
+      throw new Error('[OpenSeadragon Capture] Canvas not available. Ensure viewer is fully initialized.');
     }
     return canvas as HTMLCanvasElement;
   }
@@ -112,7 +112,7 @@ export class OpenSeadragonScreenshot {
   private async captureFullImage(imageIndex: number): Promise<HTMLCanvasElement> {
     const tiledImage = this.viewer.world.getItemAt(imageIndex);
     if (!tiledImage) {
-      throw new Error(`[OpenSeadragon Screenshot] No image at index ${imageIndex}`);
+      throw new Error(`[OpenSeadragon Capture] No image at index ${imageIndex}`);
     }
 
     const currentBounds = this.viewer.viewport.getBounds();
@@ -142,7 +142,7 @@ export class OpenSeadragonScreenshot {
     for (const overlay of overlays) {
       if (overlay.width !== canvas.width || overlay.height !== canvas.height) {
         console.warn(
-          `[OpenSeadragon Screenshot] Overlay dimensions (${overlay.width}x${overlay.height}) ` +
+          `[OpenSeadragon Capture] Overlay dimensions (${overlay.width}x${overlay.height}) ` +
           `do not match viewer canvas (${canvas.width}x${canvas.height}). ` +
           `Overlay will be stretched.`
         );
@@ -157,7 +157,7 @@ export class OpenSeadragonScreenshot {
         const outputCtx = outputCanvas.getContext('2d', { alpha: format === 'png' });
 
         if (!outputCtx) {
-          reject(new Error('[OpenSeadragon Screenshot] Failed to get canvas context'));
+          reject(new Error('[OpenSeadragon Capture] Failed to get canvas context'));
           return;
         }
 
@@ -167,7 +167,7 @@ export class OpenSeadragonScreenshot {
         const maxPixels = 16777216;
         if (outputCanvas.width * outputCanvas.height > maxPixels) {
           console.warn(
-            `[OpenSeadragon Screenshot] Output canvas is very large (${outputCanvas.width}x${outputCanvas.height}). ` +
+            `[OpenSeadragon Capture] Output canvas is very large (${outputCanvas.width}x${outputCanvas.height}). ` +
             `This may cause memory issues.`
           );
         }
@@ -186,13 +186,13 @@ export class OpenSeadragonScreenshot {
         }
 
         outputCanvas.toBlob(
-          (blob) => blob ? resolve(blob) : reject(new Error('[OpenSeadragon Screenshot] Failed to create blob')),
+          (blob) => blob ? resolve(blob) : reject(new Error('[OpenSeadragon Capture] Failed to create blob')),
           `image/${format}`,
           quality
         );
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
-        reject(new Error(`[OpenSeadragon Screenshot] ${message}. Check CORS policy if using remote images.`));
+        reject(new Error(`[OpenSeadragon Capture] ${message}. Check CORS policy if using remote images.`));
       }
     });
   }

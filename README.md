@@ -1,18 +1,18 @@
-# openseadragon-screenshot
+# openseadragon-capture
 
 Capture high-quality screenshots from OpenSeadragon viewers with optional overlay layers.
 
 ## Installation
 
 ```bash
-npm install openseadragon-screenshot
+npm install openseadragon-capture
 ```
 
 ## Usage
 
 ```typescript
 import OpenSeadragon from 'openseadragon';
-import { createScreenshot } from 'openseadragon-screenshot';
+import { createScreenshot } from 'openseadragon-capture';
 
 // Initialize OpenSeadragon viewer with CORS support
 const viewer = OpenSeadragon({
