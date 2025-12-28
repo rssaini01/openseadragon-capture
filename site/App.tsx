@@ -80,7 +80,7 @@ export function App() {
   }, [isFabricMode, handleDelete, handleExport]);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950">
+    <div className="flex flex-col h-screen bg-gray-900">
       <Header isFabricMode={isFabricMode} setIsFabricMode={setIsFabricMode} />
       {isFabricMode && (
         <TopBar
