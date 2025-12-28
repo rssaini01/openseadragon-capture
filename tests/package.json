@@ -12,6 +12,7 @@
     "openseadragon-capture": "file:.."
   },
   "devDependencies": {
+    "@codecov/vite-plugin": "^1.9.1",
     "@types/jsdom": "^27.0.0",
     "@vitest/coverage-v8": "^4.0.16",
     "@vitest/ui": "^4.0.16",

@@ -8,13 +8,6 @@ permissions:
 on:
   release:
     types: [created]
-  workflow_dispatch:
-    inputs:
-      skip_publish:
-        description: 'Skip npm publish'
-        required: false
-        default: 'false'
-        type: boolean
 
 jobs:
   build:
@@ -30,7 +23,6 @@ jobs:
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event.inputs.skip_publish != 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
