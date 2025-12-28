@@ -64,7 +64,14 @@ export class OpenSeadragonScreenshot {
    */
   async toBlob(options: ScreenshotOptions = {}): Promise<Blob> {
     this.ensureViewerReady();
-    const { format = 'png', quality = 0.9, scale = 1, overlays = [], fitImageToViewport = true, imageIndex = 0 } = options;
+    const {
+      format = 'png',
+      quality = 0.9,
+      scale = 1,
+      overlays = [],
+      fitImageToViewport = true,
+      imageIndex = 0
+    } = options;
     const stage = await this.prepareCapture(scale, overlays, fitImageToViewport, imageIndex);
     return this.renderStage(stage, format, quality);
   }

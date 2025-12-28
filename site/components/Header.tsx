@@ -25,7 +25,7 @@ export function Header({ isFabricMode, setIsFabricMode }: Readonly<HeaderProps>)
             View
           </button>
           <a
-            href="https://github.com/rssaini01/openseadragon-screenshot"
+            href="https://github.com/rssaini01/openseadragon-capture"
             target="_blank"
             rel="noopener noreferrer"
             className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 rounded-md text-white font-medium transition-all"

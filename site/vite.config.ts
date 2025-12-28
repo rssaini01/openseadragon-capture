@@ -4,10 +4,10 @@ import preact from "@preact/preset-vite";
 
 export default defineConfig(({ mode }) => ({
   plugins: [preact()],
-  base: mode === "prod" ? "/openseadragon-screenshot" : "/",
+  base: mode === "prod" ? "/openseadragon-capture" : "/",
   resolve: {
     alias: {
-      "openseadragon-screenshot":
+      "openseadragon-capture":
         mode === "prod"
           ? path.resolve(__dirname, "../dist/esm/index.js")
           : path.resolve(__dirname, "../src/index.ts"),

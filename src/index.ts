@@ -1,4 +1,5 @@
-export { OpenSeadragonScreenshot, createScreenshot, ScreenshotOptions, ScreenshotFormat } from './capture';
+export { OpenSeadragonScreenshot, createScreenshot } from './capture';
+export type { ScreenshotOptions, ScreenshotFormat } from './capture';
 
 /**
  * LIMITATIONS:

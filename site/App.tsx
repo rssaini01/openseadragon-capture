@@ -5,7 +5,7 @@ import { Toolbar } from "./components/Toolbar";
 import { Viewer } from "./components/Viewer";
 import type { FabricOverlay } from "openseadragon-fabric-overlay";
 import type OpenSeadragon from "openseadragon";
-import { createScreenshot } from "openseadragon-screenshot";
+import { createScreenshot } from "openseadragon-capture";
 
 export type Tool = "select" | "draw" | "rect" | "circle" | "text";
 
