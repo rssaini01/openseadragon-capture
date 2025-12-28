@@ -78,7 +78,7 @@ export function App() {
       }
       if (e.ctrlKey && e.key === "e") {
         e.preventDefault();
-        handleExport();
+        void handleExport();
       }
     };
     globalThis.addEventListener("keydown", handleKeyDown);

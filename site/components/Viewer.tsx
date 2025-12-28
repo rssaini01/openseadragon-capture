@@ -34,124 +34,121 @@ export function Viewer({
 
   useEffect(() => {
     propsRef.current = { isFabricMode, currentTool, currentColor, opacity };
-  }, [isFabricMode, currentTool, currentColor, opacity]);
+  });
 
   useEffect(() => {
-    if (!viewerRef.current) {
-      viewerRef.current = OpenSeadragon({
-        id: "openseadragon",
-        prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-        tileSources: "https://openseadragon.github.io/example-images/highsmith/highsmith.dzi",
-        showNavigationControl: false,
-        crossOriginPolicy: "Anonymous",
-      });
+    const viewer = OpenSeadragon({
+      id: "openseadragon",
+      prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
+      tileSources: "https://openseadragon.github.io/example-images/highsmith/highsmith.dzi",
+      showNavigationControl: false,
+      crossOriginPolicy: "Anonymous",
+    });
+    viewerRef.current = viewer;
+    onViewerReady(viewer);
 
-      onViewerReady(viewerRef.current);
-      overlayRef.current = initOSDFabricOverlay(viewerRef.current, { fabricCanvasOptions: { selection: true } }, "1");
-      onOverlayReady(overlayRef.current);
+    const overlay = initOSDFabricOverlay(viewer, { fabricCanvasOptions: { selection: true } }, "1");
+    overlayRef.current = overlay;
+    onOverlayReady(overlay);
 
-      const canvas = overlayRef.current.fabricCanvas();
+    const canvas = overlay.fabricCanvas();
 
-      canvas.on("mouse:down", (e: fabric.TPointerEventInfo) => {
-        const { isFabricMode, currentTool, currentColor, opacity } = propsRef.current;
-        if (!isFabricMode || currentTool === "draw" || !overlayRef.current) return;
+    canvas.on("mouse:down", (e: fabric.TPointerEventInfo) => {
+      const { isFabricMode, currentTool, currentColor, opacity } = propsRef.current;
+      if (!isFabricMode || currentTool === "draw" || e.target || currentTool === "select") return;
 
-        if (e.target || currentTool === "select") return;
+      const pointer = canvas.getScenePoint(e.e);
+      drawStateRef.current.startPoint = { x: pointer.x, y: pointer.y };
+      drawStateRef.current.isDrawing = true;
 
-        const pointer = overlayRef.current.fabricCanvas().getScenePoint(e.e);
-        drawStateRef.current.startPoint = { x: pointer.x, y: pointer.y };
-        drawStateRef.current.isDrawing = true;
-
-        if (currentTool === "text") {
-          const text = new fabric.FabricText("Sample Text", {
-            left: pointer.x,
-            top: pointer.y,
-            fill: currentColor,
-            fontSize: 20,
-            opacity
-          });
-          overlayRef.current.fabricCanvas().add(text);
-          overlayRef.current.fabricCanvas().setActiveObject(text);
-          return;
-        }
-
-        const props = {
+      if (currentTool === "text") {
+        const text = new fabric.FabricText("Sample Text", {
           left: pointer.x,
           top: pointer.y,
-          fill: currentColor + "40",
-          stroke: currentColor,
-          strokeWidth: 2,
+          fill: currentColor,
+          fontSize: 20,
           opacity
-        };
-        drawStateRef.current.activeShape = currentTool === "circle" ? new fabric.Circle({
-          ...props,
-          radius: 1
-        }) : new fabric.Rect({ ...props, width: 1, height: 1 });
-        overlayRef.current.fabricCanvas().add(drawStateRef.current.activeShape);
-      });
-
-      canvas.on("mouse:move", (e: fabric.TPointerEventInfo) => {
-        const { currentTool } = propsRef.current;
-        if (!drawStateRef.current.isDrawing || !drawStateRef.current.startPoint || !drawStateRef.current.activeShape || !overlayRef.current) return;
-
-        const pointer = overlayRef.current.fabricCanvas().getScenePoint(e.e);
-        const start = drawStateRef.current.startPoint;
-        const width = Math.abs(pointer.x - start.x);
-        const height = Math.abs(pointer.y - start.y);
-        const left = Math.min(start.x, pointer.x);
-        const top = Math.min(start.y, pointer.y);
-
-        if (currentTool === "rect") {
-          (drawStateRef.current.activeShape as fabric.Rect).set({ left, top, width, height });
-        } else if (currentTool === "circle") {
-          const radius = Math.hypot(width, height) / 2;
-          (drawStateRef.current.activeShape as fabric.Circle).set({
-            left: (start.x + pointer.x) / 2 - radius,
-            top: (start.y + pointer.y) / 2 - radius,
-            radius
-          });
-        }
-        overlayRef.current.fabricCanvas().renderAll();
-      });
-
-      canvas.on("mouse:up", () => {
-        if (!drawStateRef.current.isDrawing || !overlayRef.current) return;
-
-        drawStateRef.current.isDrawing = false;
-        drawStateRef.current.startPoint = null;
-
-        if (drawStateRef.current.activeShape) {
-          overlayRef.current.fabricCanvas().setActiveObject(drawStateRef.current.activeShape);
-          drawStateRef.current.activeShape = null;
-        }
-      });
-    }
-
-    return () => {
-      if (viewerRef.current) {
-        viewerRef.current.destroy();
-        viewerRef.current = null;
+        });
+        canvas.add(text);
+        canvas.setActiveObject(text);
+        return;
       }
-    };
+
+      const props = {
+        left: pointer.x,
+        top: pointer.y,
+        fill: currentColor + "40",
+        stroke: currentColor,
+        strokeWidth: 2,
+        opacity
+      };
+      drawStateRef.current.activeShape = currentTool === "circle"
+        ? new fabric.Circle({ ...props, radius: 1 })
+        : new fabric.Rect({ ...props, width: 1, height: 1 });
+      canvas.add(drawStateRef.current.activeShape);
+    });
+
+    canvas.on("mouse:move", (e: fabric.TPointerEventInfo) => {
+      const { currentTool } = propsRef.current;
+      const { isDrawing, startPoint, activeShape } = drawStateRef.current;
+      if (!isDrawing || !startPoint || !activeShape) return;
+
+      const pointer = canvas.getScenePoint(e.e);
+      const width = Math.abs(pointer.x - startPoint.x);
+      const height = Math.abs(pointer.y - startPoint.y);
+
+      if (currentTool === "rect") {
+        (activeShape as fabric.Rect).set({
+          left: Math.min(startPoint.x, pointer.x),
+          top: Math.min(startPoint.y, pointer.y),
+          width,
+          height
+        });
+      } else if (currentTool === "circle") {
+        const radius = Math.hypot(width, height) / 2;
+        (activeShape as fabric.Circle).set({
+          left: (startPoint.x + pointer.x) / 2 - radius,
+          top: (startPoint.y + pointer.y) / 2 - radius,
+          radius
+        });
+      }
+      canvas.renderAll();
+    });
+
+    canvas.on("mouse:up", () => {
+      if (!drawStateRef.current.isDrawing) return;
+
+      drawStateRef.current.isDrawing = false;
+      drawStateRef.current.startPoint = null;
+
+      if (drawStateRef.current.activeShape) {
+        canvas.setActiveObject(drawStateRef.current.activeShape);
+        drawStateRef.current.activeShape = null;
+      }
+    });
+
+    return () => viewer.destroy();
   }, []);
 
   useEffect(() => {
-    if (!overlayRef.current) return;
-    overlayRef.current.setViewerMouseNavEnabled(!isFabricMode);
-    if (!isFabricMode) overlayRef.current.fabricCanvas().isDrawingMode = false;
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+
+    overlay.setViewerMouseNavEnabled(!isFabricMode);
+    if (!isFabricMode) overlay.fabricCanvas().isDrawingMode = false;
   }, [isFabricMode]);
 
   useEffect(() => {
-    if (!overlayRef.current) return;
-    const canvas = overlayRef.current.fabricCanvas();
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+
+    const canvas = overlay.fabricCanvas();
+    canvas.isDrawingMode = currentTool === "draw";
 
     if (currentTool === "draw") {
-      canvas.isDrawingMode = true;
       canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
       canvas.freeDrawingBrush.width = brushSize;
       canvas.freeDrawingBrush.color = currentColor;
-    } else {
-      canvas.isDrawingMode = false;
     }
   }, [currentTool, currentColor, brushSize]);
 
