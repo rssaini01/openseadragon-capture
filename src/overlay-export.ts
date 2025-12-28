@@ -1,11 +1,32 @@
 import OpenSeadragon from 'openseadragon';
 
 export interface ScreenshotOptions {
+  /** Output image format. @default 'png' */
   format?: 'png' | 'jpeg' | 'webp';
+  /** Image quality (0-1). @default 0.9 */
   quality?: number;
+  /**
+   * Upscaling factor applied via canvas interpolation.
+   * Does NOT fetch higher-resolution tiles.
+   * @default 1
+   */
   scale?: number;
+  /**
+   * Overlay canvases to composite.
+   * Must already be in viewer pixel space with transforms applied.
+   */
   overlays?: HTMLCanvasElement[];
+  /**
+   * If true, temporarily fits entire image to viewport before capture.
+   * Causes momentary viewport change.
+   * @default true
+   */
   fitImageToViewport?: boolean;
+  /**
+   * Index of the tiled image to capture.
+   * @default 0
+   */
+  imageIndex?: number;
 }
 
 interface CaptureStage {
@@ -21,6 +42,10 @@ export class OpenSeadragonScreenshot {
     this.viewer = viewer;
   }
 
+  /**
+   * Captures the viewer as a data URL.
+   * @throws {Error} If viewer is not open or canvas is unavailable
+   */
   async capture(options: ScreenshotOptions = {}): Promise<string> {
     const blob = await this.toBlob(options);
     return new Promise((resolve, reject) => {
@@ -31,42 +56,57 @@ export class OpenSeadragonScreenshot {
     });
   }
 
+  /**
+   * Captures the viewer as a Blob (recommended for memory efficiency).
+   * @throws {Error} If viewer is not open or canvas is unavailable
+   */
   async toBlob(options: ScreenshotOptions = {}): Promise<Blob> {
-    const { format = 'png', quality = 0.9, scale = 1, overlays = [], fitImageToViewport = true } = options;
-    const stage = await this.prepareCapture(scale, overlays, fitImageToViewport);
+    this.ensureViewerReady();
+    const { format = 'png', quality = 0.9, scale = 1, overlays = [], fitImageToViewport = true, imageIndex = 0 } = options;
+    const stage = await this.prepareCapture(scale, overlays, fitImageToViewport, imageIndex);
     return this.renderStage(stage, format, quality);
   }
 
-  private async prepareCapture(scale: number, overlays: HTMLCanvasElement[], fitImageToViewport: boolean): Promise<CaptureStage> {
-    await this.waitForTiles();
+  private ensureViewerReady(): void {
+    if (!this.viewer.isOpen()) {
+      throw new Error('Viewer is not open. Wait for the "open" event before capturing.');
+    }
+  }
+
+  private async prepareCapture(scale: number, overlays: HTMLCanvasElement[], fitImageToViewport: boolean, imageIndex: number): Promise<CaptureStage> {
+    await this.waitForDraw();
 
     if (fitImageToViewport) {
-      const canvas = await this.captureFullImage();
+      const canvas = await this.captureFullImage(imageIndex);
       return { canvas, overlays, scale };
     }
 
-    const canvas = this.viewer.drawer.canvas as HTMLCanvasElement;
+    const canvas = this.getCanvas();
     return { canvas, overlays, scale };
   }
 
-  private waitForTiles(): Promise<void> {
+  private getCanvas(): HTMLCanvasElement {
+    const canvas = this.viewer.drawer?.canvas;
+    if (!canvas) {
+      throw new Error('Canvas not available. Ensure viewer is fully initialized.');
+    }
+    return canvas as HTMLCanvasElement;
+  }
+
+  private waitForDraw(): Promise<void> {
     return new Promise((resolve) => {
-      if (this.viewer.world.getItemAt(0)?.getFullyLoaded()) {
+      this.viewer.addOnceHandler('animation-finish', () => {
         requestAnimationFrame(() => resolve());
-      } else {
-        const handler = () => {
-          this.viewer.world.removeHandler('add-item', handler);
-          resolve();
-        };
-        this.viewer.world.addHandler('add-item', handler);
-        setTimeout(resolve, 100);
-      }
+      });
+      this.viewer.forceRedraw();
     });
   }
 
-  private async captureFullImage(): Promise<HTMLCanvasElement> {
-    const tiledImage = this.viewer.world.getItemAt(0);
-    if (!tiledImage) throw new Error('No image loaded');
+  private async captureFullImage(imageIndex: number): Promise<HTMLCanvasElement> {
+    const tiledImage = this.viewer.world.getItemAt(imageIndex);
+    if (!tiledImage) {
+      throw new Error(`No image at index ${imageIndex}`);
+    }
 
     const currentBounds = this.viewer.viewport.getBounds();
     const bounds = tiledImage.getBounds();
@@ -74,22 +114,20 @@ export class OpenSeadragonScreenshot {
     try {
       this.viewer.viewport.fitBounds(bounds, true);
       await this.waitForFullLoad(tiledImage);
-      return this.viewer.drawer.canvas as HTMLCanvasElement;
+      return this.getCanvas();
     } finally {
       this.viewer.viewport.fitBounds(currentBounds, true);
     }
   }
 
   private waitForFullLoad(tiledImage: OpenSeadragon.TiledImage): Promise<void> {
-    return new Promise(resolve => {
-      const checkTiles = () => {
-        if (tiledImage.getFullyLoaded()) {
-          resolve(undefined);
-        } else {
-          requestAnimationFrame(checkTiles);
-        }
-      };
-      setTimeout(checkTiles, 100);
+    if (tiledImage.getFullyLoaded()) {
+      return this.waitForDraw();
+    }
+    return new Promise((resolve) => {
+      tiledImage.addOnceHandler('fully-loaded-change', () => {
+        this.waitForDraw().then(resolve);
+      });
     });
   }
 

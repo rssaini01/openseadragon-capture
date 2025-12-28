@@ -2,9 +2,9 @@ export { OpenSeadragonScreenshot, createScreenshot, type ScreenshotOptions } fro
 
 /**
  * LIMITATIONS:
- * - scale parameter upscales existing canvas, does NOT re-render tiles at higher resolution
+ * - Viewport-sized export only (scale upsamples via interpolation, does NOT fetch higher-res tiles)
  * - Requires CORS-enabled images (set crossOriginPolicy: 'Anonymous' in viewer config)
  * - fitImageToViewport mode temporarily changes viewport (may cause visual flicker)
- * - Timing depends on tile loading; may fail if tiles aren't fully loaded
- * - Overlay canvases must match viewer dimensions or will be stretched
+ * - Single-image viewers by default (use imageIndex option for multi-image viewers)
+ * - Overlay canvases must already be in viewer pixel space with transforms applied
  */
