@@ -1,13 +1,19 @@
+type ImageFormat = 'png' | 'jpeg' | 'webp';
+
 interface TopBarProps {
   onDelete: () => void;
   onClearAll: () => void;
   onExport: () => void;
   objectCount: number;
+  format: ImageFormat;
+  setFormat: (format: ImageFormat) => void;
+  quality: number;
+  setQuality: (quality: number) => void;
 }
 
 import { Trash2, Eraser, Download } from "lucide-preact";
 
-export function TopBar({ onDelete, onClearAll, onExport, objectCount }: Readonly<TopBarProps>) {
+export function TopBar({ onDelete, onClearAll, onExport, objectCount, format, setFormat, quality, setQuality }: Readonly<TopBarProps>) {
   return (
     <div className="bg-gray-100 border-b border-gray-300 px-6 py-3 flex items-center gap-3">
       <button
@@ -27,10 +33,31 @@ export function TopBar({ onDelete, onClearAll, onExport, objectCount }: Readonly
       <button
         className="p-2 bg-green-600 hover:bg-green-700 rounded text-white transition-all flex items-center gap-2"
         onClick={onExport}
-        title="Export PNG"
+        title="Export"
       >
         <Download size={16} />
       </button>
+      <select
+        className="px-3 py-1.5 rounded border border-gray-300 text-sm"
+        value={format}
+        onChange={(e) => setFormat(e.currentTarget.value as ImageFormat)}
+      >
+        <option value="png">PNG</option>
+        <option value="jpeg">JPEG</option>
+        <option value="webp">WebP</option>
+      </select>
+      <label className="flex items-center gap-2 text-sm">
+        Quality: <input
+          type="range"
+          min="0.1"
+          max="1"
+          step="0.1"
+          value={quality}
+          onChange={(e) => setQuality(Number.parseFloat(e.currentTarget.value))}
+          className="w-24"
+        />
+        <span className="w-8 text-gray-700">{quality.toFixed(1)}</span>
+      </label>
       <div className="flex-1"></div>
       <div className="bg-indigo-100 border border-indigo-300 px-3 py-1.5 rounded">
         <span className="text-sm font-semibold text-indigo-700">Objects: {objectCount}</span>

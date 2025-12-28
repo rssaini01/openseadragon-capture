@@ -32,10 +32,10 @@ export class OpenSeadragonScreenshot {
         // Draw main viewer content
         outputCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, outputCanvas.width, outputCanvas.height);
         
-        // Draw overlays
+        // Draw overlays scaled to match output canvas
         for (const overlay of overlays) {
           if (overlay.width > 0 && overlay.height > 0) {
-            outputCtx.drawImage(overlay, 0, 0);
+            outputCtx.drawImage(overlay, 0, 0, overlay.width, overlay.height, 0, 0, outputCanvas.width, outputCanvas.height);
           }
         }
         

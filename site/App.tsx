@@ -4,6 +4,8 @@ import { TopBar } from "./components/TopBar";
 import { Toolbar } from "./components/Toolbar";
 import { Viewer } from "./components/Viewer";
 import type { FabricOverlay } from "openseadragon-fabric-overlay";
+import type OpenSeadragon from "openseadragon";
+import { createScreenshot } from "openseadragon-screenshot";
 
 export type Tool = "select" | "draw" | "rect" | "circle" | "text";
 
@@ -14,7 +16,10 @@ export function App() {
   const [brushSize, setBrushSize] = useState(5);
   const [opacity, setOpacity] = useState(1);
   const [objectCount, setObjectCount] = useState(0);
+  const [format, setFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
+  const [quality, setQuality] = useState(1);
   const overlayRef = useRef<FabricOverlay | null>(null);
+  const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
 
   const handleClearAll = () => {
     overlayRef.current?.clearFabric();
@@ -44,14 +49,15 @@ export function App() {
     }
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    if (!viewerRef.current) return;
     const canvas = overlayRef.current?.fabricCanvas();
-    if (!canvas) return;
-    const dataURL = canvas.toDataURL({ format: "png", quality: 1, multiplier: 1 });
-    const link = document.createElement("a");
-    link.download = "canvas-export.png";
-    link.href = dataURL;
-    link.click();
+    const screenshot = createScreenshot(viewerRef.current);
+    await screenshot.download(`screenshot.${format}`, {
+      format,
+      quality,
+      overlays: canvas ? [canvas.getElement()] : []
+    });
   };
 
   const updateObjectCount = () => {
@@ -88,6 +94,10 @@ export function App() {
           onClearAll={handleClearAll}
           onExport={handleExport}
           objectCount={objectCount}
+          format={format}
+          setFormat={setFormat}
+          quality={quality}
+          setQuality={setQuality}
         />
       )}
       <div className="flex flex-1 overflow-hidden">
@@ -110,6 +120,7 @@ export function App() {
             currentColor={currentColor}
             brushSize={brushSize}
             opacity={opacity}
+            onViewerReady={(viewer) => { viewerRef.current = viewer; }}
             onOverlayReady={(overlay) => {
               overlayRef.current = overlay;
               const canvas = overlay.fabricCanvas();

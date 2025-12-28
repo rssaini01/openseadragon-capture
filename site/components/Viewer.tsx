@@ -10,6 +10,7 @@ interface ViewerProps {
   currentColor: string;
   brushSize: number;
   opacity: number;
+  onViewerReady: (viewer: OpenSeadragon.Viewer) => void;
   onOverlayReady: (overlay: FabricOverlay) => void;
 }
 
@@ -19,6 +20,7 @@ export function Viewer({
   currentColor,
   brushSize,
   opacity,
+  onViewerReady,
   onOverlayReady,
 }: Readonly<ViewerProps>) {
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
@@ -44,6 +46,7 @@ export function Viewer({
         crossOriginPolicy: "Anonymous",
       });
 
+      onViewerReady(viewerRef.current);
       overlayRef.current = initOSDFabricOverlay(viewerRef.current, { fabricCanvasOptions: { selection: true } }, "1");
       onOverlayReady(overlayRef.current);
 
