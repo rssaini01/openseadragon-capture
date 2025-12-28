@@ -1,4 +1,4 @@
-export { OpenSeadragonScreenshot, createScreenshot, ScreenshotOptions, ScreenshotFormat } from './overlay-export';
+export { OpenSeadragonScreenshot, createScreenshot, ScreenshotOptions, ScreenshotFormat } from './capture';
 
 /**
  * LIMITATIONS:
