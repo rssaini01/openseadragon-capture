@@ -1,5 +1,6 @@
 # openseadragon-capture
 
+[![codecov](https://codecov.io/github/rssaini01/openseadragon-capture/graph/badge.svg?token=004LNMKF4C)](https://codecov.io/github/rssaini01/openseadragon-capture)
 [![npm version](https://img.shields.io/npm/v/openseadragon-capture.svg)](https://www.npmjs.com/package/openseadragon-capture)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/rssaini01/openseadragon-capture/deploy-demo-site.yml?branch=main)](https://github.com/rssaini01/openseadragon-capture/actions)
