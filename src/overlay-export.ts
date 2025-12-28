@@ -5,6 +5,7 @@ export interface ScreenshotOptions {
   quality?: number;
   scale?: number;
   overlays?: HTMLCanvasElement[];
+  fullImage?: boolean;
 }
 
 export class OpenSeadragonScreenshot {
@@ -15,33 +16,92 @@ export class OpenSeadragonScreenshot {
   }
 
   async capture(options: ScreenshotOptions = {}): Promise<string> {
-    const { format = 'png', quality = 0.9, scale = 1, overlays = [] } = options;
+    const { format = 'png', quality = 0.9, scale = 1, overlays = [], fullImage = true } = options;
     
-    return new Promise((resolve) => {
-      // Wait for next frame to ensure canvas is updated
+    return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
-        const canvas = this.viewer.drawer.canvas as HTMLCanvasElement;
-        
-        // Create output canvas
-        const outputCanvas = document.createElement('canvas');
-        const outputCtx = outputCanvas.getContext('2d')!;
-        
-        outputCanvas.width = canvas.width * scale;
-        outputCanvas.height = canvas.height * scale;
-        
-        // Draw main viewer content
-        outputCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, outputCanvas.width, outputCanvas.height);
-        
-        // Draw overlays scaled to match output canvas
-        for (const overlay of overlays) {
-          if (overlay.width > 0 && overlay.height > 0) {
-            outputCtx.drawImage(overlay, 0, 0, overlay.width, overlay.height, 0, 0, outputCanvas.width, outputCanvas.height);
-          }
+        if (fullImage) {
+          this.captureFullImage(scale, overlays, format, quality, resolve, reject);
+        } else {
+          this.captureViewport(scale, overlays, format, quality, resolve, reject);
         }
-        
-        resolve(outputCanvas.toDataURL(`image/${format}`, quality));
       });
     });
+  }
+
+  private captureViewport(
+    scale: number,
+    overlays: HTMLCanvasElement[],
+    format: string,
+    quality: number,
+    resolve: (value: string) => void,
+    reject: (reason: Error) => void
+  ): void {
+    const canvas = this.viewer.drawer.canvas as HTMLCanvasElement;
+    this.renderToCanvas(canvas, scale, overlays, format, quality, resolve, reject);
+  }
+
+  private captureFullImage(
+    scale: number,
+    overlays: HTMLCanvasElement[],
+    format: string,
+    quality: number,
+    resolve: (value: string) => void,
+    reject: (reason: Error) => void
+  ): void {
+    const tiledImage = this.viewer.world.getItemAt(0);
+    if (!tiledImage) {
+      reject(new Error('No image loaded'));
+      return;
+    }
+
+    const currentBounds = this.viewer.viewport.getBounds();
+    const bounds = tiledImage.getBounds();
+    
+    this.viewer.viewport.fitBounds(bounds, true);
+    
+    setTimeout(() => {
+      try {
+        const canvas = this.viewer.drawer.canvas as HTMLCanvasElement;
+        this.renderToCanvas(canvas, scale, overlays, format, quality, resolve, reject);
+      } finally {
+        this.viewer.viewport.fitBounds(currentBounds, true);
+      }
+    }, 500);
+  }
+
+  private renderToCanvas(
+    canvas: HTMLCanvasElement,
+    scale: number,
+    overlays: HTMLCanvasElement[],
+    format: string,
+    quality: number,
+    resolve: (value: string) => void,
+    reject: (reason: Error) => void
+  ): void {
+    try {
+      const outputCanvas = document.createElement('canvas');
+      const outputCtx = outputCanvas.getContext('2d', { alpha: format === 'png' })!;
+      
+      outputCanvas.width = canvas.width * scale;
+      outputCanvas.height = canvas.height * scale;
+      
+      outputCtx.imageSmoothingEnabled = true;
+      outputCtx.imageSmoothingQuality = 'high';
+      
+      outputCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, outputCanvas.width, outputCanvas.height);
+      
+      for (const overlay of overlays) {
+        if (overlay.width > 0 && overlay.height > 0) {
+          outputCtx.drawImage(overlay, 0, 0, overlay.width, overlay.height, 0, 0, outputCanvas.width, outputCanvas.height);
+        }
+      }
+      
+      resolve(outputCanvas.toDataURL(`image/${format}`, quality));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      reject(new Error(`CORS error: Image cannot be exported. Ensure crossOriginPolicy is set and server allows CORS. ${message}`));
+    }
   }
 
   async download(filename: string, options: ScreenshotOptions = {}): Promise<void> {

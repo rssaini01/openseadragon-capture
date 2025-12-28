@@ -9,11 +9,28 @@ interface TopBarProps {
   setFormat: (format: ImageFormat) => void;
   quality: number;
   setQuality: (quality: number) => void;
+  scale: number;
+  setScale: (scale: number) => void;
+  fullImage: boolean;
+  setFullImage: (fullImage: boolean) => void;
 }
 
 import { Trash2, Eraser, Download } from "lucide-preact";
 
-export function TopBar({ onDelete, onClearAll, onExport, objectCount, format, setFormat, quality, setQuality }: Readonly<TopBarProps>) {
+export function TopBar({
+  onDelete,
+  onClearAll,
+  onExport,
+  objectCount,
+  format,
+  setFormat,
+  quality,
+  setQuality,
+  scale,
+  setScale,
+  fullImage,
+  setFullImage
+}: Readonly<TopBarProps>) {
   return (
     <div className="bg-gray-100 border-b border-gray-300 px-6 py-3 flex items-center gap-3">
       <button
@@ -48,15 +65,35 @@ export function TopBar({ onDelete, onClearAll, onExport, objectCount, format, se
       </select>
       <label className="flex items-center gap-2 text-sm">
         Quality: <input
-          type="range"
-          min="0.1"
-          max="1"
-          step="0.1"
-          value={quality}
-          onChange={(e) => setQuality(Number.parseFloat(e.currentTarget.value))}
-          className="w-24"
-        />
+        type="range"
+        min="0.1"
+        max="1"
+        step="0.1"
+        value={quality}
+        onChange={(e) => setQuality(Number.parseFloat(e.currentTarget.value))}
+        className="w-24"
+      />
         <span className="w-8 text-gray-700">{quality.toFixed(1)}</span>
+      </label>
+      <label className="flex items-center gap-2 text-sm">
+        Scale: <input
+        type="range"
+        min="1"
+        max="4"
+        step="0.5"
+        value={scale}
+        onChange={(e) => setScale(Number.parseFloat(e.currentTarget.value))}
+        className="w-24"
+      />
+        <span className="w-8 text-gray-700">{scale.toFixed(1)}x</span>
+      </label>
+      <label className="flex items-center gap-2 text-sm cursor-pointer">
+        <input
+          type="checkbox"
+          checked={fullImage}
+          onChange={(e) => setFullImage(e.currentTarget.checked)}
+          className="cursor-pointer"
+        /> Full Image
       </label>
       <div className="flex-1"></div>
       <div className="bg-indigo-100 border border-indigo-300 px-3 py-1.5 rounded">

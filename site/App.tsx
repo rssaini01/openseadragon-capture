@@ -18,6 +18,8 @@ export function App() {
   const [objectCount, setObjectCount] = useState(0);
   const [format, setFormat] = useState<'png' | 'jpeg' | 'webp'>('png');
   const [quality, setQuality] = useState(1);
+  const [scale, setScale] = useState(1);
+  const [fullImage, setFullImage] = useState(true);
   const overlayRef = useRef<FabricOverlay | null>(null);
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
 
@@ -51,13 +53,19 @@ export function App() {
 
   const handleExport = async () => {
     if (!viewerRef.current) return;
-    const canvas = overlayRef.current?.fabricCanvas();
-    const screenshot = createScreenshot(viewerRef.current);
-    await screenshot.download(`screenshot.${format}`, {
-      format,
-      quality,
-      overlays: canvas ? [canvas.getElement()] : []
-    });
+    try {
+      const canvas = overlayRef.current?.fabricCanvas();
+      const screenshot = createScreenshot(viewerRef.current);
+      await screenshot.download(`screenshot.${format}`, {
+        format,
+        quality,
+        scale,
+        fullImage,
+        overlays: canvas ? [canvas.getElement()] : []
+      });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Export failed');
+    }
   };
 
   const updateObjectCount = () => {
@@ -98,6 +106,10 @@ export function App() {
           setFormat={setFormat}
           quality={quality}
           setQuality={setQuality}
+          scale={scale}
+          setScale={setScale}
+          fullImage={fullImage}
+          setFullImage={setFullImage}
         />
       )}
       <div className="flex flex-1 overflow-hidden">
