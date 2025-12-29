@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createScreenshot, OpenSeadragonScreenshot } from 'openseadragon-capture';
+import { createScreenshot, OpenSeadragonScreenshot } from '../../src';
 
 const createMockViewer = (isOpen = true) => {
   const mockTiledImage = {
