@@ -72,6 +72,51 @@ describe('OpenSeadragonScreenshot', () => {
       const blob = await screenshot.toBlob({ scale: 2 });
       expect(blob).toBeInstanceOf(Blob);
     });
+
+    it('should handle webp format', async () => {
+      const blob = await screenshot.toBlob({ format: 'webp' });
+      expect(blob.type).toBe('image/webp');
+    });
+
+    it('should throw when canvas unavailable', async () => {
+      viewer.drawer = {};
+      await expect(screenshot.toBlob()).rejects.toThrow('Canvas not available');
+    });
+
+    it('should throw for invalid image index', async () => {
+      viewer.world.getItemAt.mockReturnValue(null);
+      await expect(screenshot.toBlob({ imageIndex: 5 })).rejects.toThrow('No image at index 5');
+    });
+
+    it('should handle overlays', async () => {
+      const overlay = document.createElement('canvas');
+      overlay.width = 400;
+      overlay.height = 300;
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      await screenshot.toBlob({ overlays: [overlay] });
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle large scale warning', async () => {
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      await screenshot.toBlob({ scale: 10 });
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it('should handle tiles not loaded', async () => {
+      const mockTiledImage = {
+        getFullyLoaded: vi.fn(() => false),
+        addOnceHandler: vi.fn((event, handler) => setTimeout(handler, 10)),
+        getBounds: vi.fn(() => ({ x: 0, y: 0, width: 1, height: 1 }))
+      };
+      viewer.world.getItemAt.mockReturnValue(mockTiledImage);
+
+      const blob = await screenshot.toBlob();
+      expect(blob).toBeInstanceOf(Blob);
+    });
   });
 
   describe('capture', () => {
@@ -84,6 +129,18 @@ describe('OpenSeadragonScreenshot', () => {
       const dataUrl = await screenshot.capture({ format: 'jpeg' });
       expect(dataUrl).toMatch(/^data:image\/jpeg;base64,/);
     });
+
+    it('should handle FileReader error', async () => {
+      const originalFileReader = global.FileReader;
+      global.FileReader = class {
+        readAsDataURL() {
+          setTimeout(() => (this as any).onerror?.(new Error('FileReader error')), 0);
+        }
+      } as any;
+
+      await expect(screenshot.capture()).rejects.toThrow('Failed to convert blob to data URL');
+      global.FileReader = originalFileReader;
+    });
   });
 
   describe('download', () => {
@@ -91,6 +148,33 @@ describe('OpenSeadragonScreenshot', () => {
       const createElementSpy = vi.spyOn(document, 'createElement');
       await screenshot.download('test.png');
       expect(createElementSpy).toHaveBeenCalledWith('a');
+    });
+
+    it('should handle requestIdleCallback fallback', async () => {
+      const original = global.requestIdleCallback;
+      delete (global as any).requestIdleCallback;
+      const setTimeoutSpy = vi.spyOn(global, 'setTimeout');
+
+      await screenshot.download('test.png');
+      expect(setTimeoutSpy).toHaveBeenCalled();
+
+      global.requestIdleCallback = original;
+    });
+
+    it('should handle canvas context failure', async () => {
+      const original = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = vi.fn(() => null);
+
+      await expect(screenshot.toBlob()).rejects.toThrow('Failed to get canvas context');
+      HTMLCanvasElement.prototype.getContext = original;
+    });
+
+    it('should handle toBlob failure', async () => {
+      const original = HTMLCanvasElement.prototype.toBlob;
+      HTMLCanvasElement.prototype.toBlob = function (callback) { callback(null); };
+
+      await expect(screenshot.toBlob()).rejects.toThrow('Failed to create blob');
+      HTMLCanvasElement.prototype.toBlob = original;
     });
   });
 });
