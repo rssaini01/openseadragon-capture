@@ -1,13 +1,26 @@
 import { defineConfig } from 'vitest/config';
 import { codecovVitePlugin } from "@codecov/vite-plugin";
+import path from 'node:path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, '../src')
+    }
+  },
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./setup.ts'],
-    reporters: ['junit'],
-    outputFile: '../test-results.xml',
+    root: '..',
+    setupFiles: ['./tests/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.ts'],
+      reportsDirectory: './tests/coverage'
+    },
+    reporters: ['default', 'junit'],
+    outputFile: 'test-results.xml',
   },
   plugins: [
     // Put the Codecov vite plugin after all other plugins
